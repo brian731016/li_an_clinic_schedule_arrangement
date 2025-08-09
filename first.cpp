@@ -51,20 +51,22 @@ public:
         for(int i=2;i<=5;i++){
             session_struct[i]=session_struct[1];
         }
+        cin>>session_struct_c;
         for(int i=0,worker_c;i<session_struct_c;i++){
             cin>>worker_c;
             session_struct[6].push_back(worker_c);
         }
+        /* end */
+
         for(int i=0,session_count;i<part_time_c;i++){
             cin>>session_count;
             part_time_session_c.push_back(session_count);
         }
-        /* end */
-
         int off_sessions_count;
         cin>>off_sessions_count;
         for(int id,off_session_day_in_month,session_index;off_sessions_count--;){
             cin>>id>>off_session_day_in_month>>session_index;
+            off_session_day_in_month--;
             if(!off_sessions.count(id)){
                 off_sessions[id]=set<pii>();
             }
@@ -81,7 +83,12 @@ public:
     int in_week;    // day of week
     Date(int dc,int m,int w):day_c_of_this_month(dc),in_month(m),in_week(w){}
     void go_to_the_next_day(){
-        in_month=(in_month+1)%day_c_of_this_month;
+        if(in_month+1==day_c_of_this_month){
+            in_month=0;
+            in_week=(in_week-day_c_of_this_month+36)%7;
+            return;
+        }
+        in_month++;
         in_week=(in_week+1)%7;
     }
     bool operator==(const Date other) const {
@@ -125,14 +132,10 @@ private:
         return schedule_worker_order;
     }
 
-    bool has_conflict(Date date,int id){  // the worder <id> has another jobs in other job type
-        for(auto one_job_schedule : schedule){
-            for(auto one_day_schedul : one_job_schedule){
-                for(auto one_session : one_day_schedul){
-                    if(one_session.count(id)){
-                        return true;
-                    }
-                }
+    bool has_conflict(Date date,int session_idx,int id){  // the worder <id> has another jobs in other job type
+        for(int i=0;i<type_of_jobs_c;i++){
+            if(schedule[i][date.in_month][session_idx].count(id)){
+                return true;
             }
         }
         return false;
@@ -145,7 +148,7 @@ private:
             if(cur_pos_info.off_sessions[id].count(pii(date.in_month,session_idx))
                     || schedule[type_of_job][date.in_month][session_idx].size()==cur_pos_info.session_struct[date.in_week][session_idx]
                     || schedule[type_of_job][date.in_month][session_idx].count(id)
-                    || has_conflict(date,id)){
+                    || has_conflict(date,session_idx,id)){
                 continue;
             }
             available_sessions.push_back(session_idx);
@@ -243,6 +246,9 @@ private:
         vector<bool>done_scheduling(cur_pos_info.full_time_c,false);
         Date cur_day(day_c_of_this_month,0,first_day_of_the_month_in_week);
         for(int cur_arranging_index:schedule_full_time_order){
+            if(left_c==0){
+                break;
+            }
             int cur_id=cur_pos_info.full_time_id[cur_arranging_index];
             if(cur_pos_info.full_time_sessions_pending_c[cur_id]==0){
                 if(!done_scheduling[cur_arranging_index]){
@@ -258,7 +264,7 @@ private:
 
     void print_one_session_schedule(int day_in_month,int day_in_week,int session_idx){
         for(int i=0;i<type_of_jobs_c;i++){
-            cout<<"    job type "<<i+1<<": ";
+            cout<<"        job type "<<i+1<<": ";
             for(int id:schedule[i][day_in_month][session_idx]){
                 cout<<id<<" ";
             }
@@ -273,11 +279,12 @@ private:
             "Wednesday", // day 3
             "Thursday",  // day 4
             "Friday",    // day 5
-            "Saturday"  // day 6
+            "Saturday"   // day 6
         };
         vector<int>session_c={0,3,3,3,3,3,2};
-        cout<<year<<'/'<<month<<'/'<<day_in_month<<' '<<day_num_to_day_name[day_in_week]<<'\n';
+        cout<<year<<'/'<<month<<'/'<<day_in_month+1<<' '<<day_num_to_day_name[day_in_week]<<'\n';
         for(int i=0;i<session_c[day_in_week];i++){
+            cout<<"    session "<<i+1<<":\n";
             print_one_session_schedule(day_in_month,day_in_week,i);
         }
     }
@@ -285,6 +292,7 @@ public:
     void arrange_schedule(){
         for(int i=0;i<type_of_jobs_c;i++){
             arrange_full_time_schedule(i);
+            cout<<"job "<<i<<" arranged\n";
         }
     }
 
@@ -297,7 +305,7 @@ public:
 
         cin>>year>>month>>first_day_of_the_month_in_week;
         vector<int> month_to_day_c={-1,31,28,31,30,31,30,31,31,30,31,30,31};
-        if (month==2 && (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+        if (month==2 && ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))) {
             day_c_of_this_month=29;
         }else{
             day_c_of_this_month=month_to_day_c[month];
@@ -313,19 +321,44 @@ public:
                 info.part_time_sessions_pending_c[info.part_time_id[i]]=info.part_time_session_c[i];
             }
         }
+
+
+        for(int type_of_job=0;type_of_job<type_of_jobs_c;type_of_job++){
+            schedule.push_back(vector<vector<set<int>>>());
+            Date cur_day(day_c_of_this_month,0,first_day_of_the_month_in_week);
+            for(int j=0;j<day_c_of_this_month;j++){
+                schedule[type_of_job].push_back(vector<set<int>>());
+                for(int k=0;k<position_infos[type_of_job].session_struct[cur_day.in_week].size();k++){
+                    schedule[type_of_job][j].push_back(set<int>());
+                }
+                cur_day.go_to_the_next_day();
+            }
+        }
     }
 
     void print_schedule(){
         for(int i=0;i<day_c_of_this_month;i++){
-            print_one_day_schedule(i+1,(first_day_of_the_month_in_week+i)%7);
+            print_one_day_schedule(i,(first_day_of_the_month_in_week+i)%7);
             cout<<'\n';
+        }
+        for(int i=0;i<type_of_jobs_c;i++){
+            cout<<"job type "<<i+1<<":\n";
+            for(auto [id,left_c]:position_infos[i].full_time_sessions_pending_c){
+                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
+            }
+            for(auto [id,left_c]:position_infos[i].part_time_sessions_pending_c){
+                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
+            }
         }
     }
 };
 
 int main(int argc,char* argv[]){
+    ios::sync_with_stdio(0),cin.tie(0);
     Arrange_schedule li_an_arrange;
     li_an_arrange.input_and_init();
+    cout<<"input done\n";
     li_an_arrange.arrange_schedule();
+    cout<<"arrange done\n\n";
     li_an_arrange.print_schedule();
 }

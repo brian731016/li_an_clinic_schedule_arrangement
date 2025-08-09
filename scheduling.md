@@ -13,6 +13,8 @@ Sat
 morning 2n 1a
 afternoon 2n 1n
 
+total 190 sessions
+
 Fen is both n and a, so she can't be n and a at the same session.
 
 
@@ -89,4 +91,3 @@ first_day_of_the_month_in_week
 2025
 11
 6 
-
