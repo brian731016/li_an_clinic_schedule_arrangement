@@ -21,19 +21,54 @@ public:
     int part_time_c;
     vector<int> full_time_id;
     vector<int> part_time_id;
-    map<int,int> full_time_id_to_index;
-    map<int,int> part_time_id_to_index;
-    map<int,set<pii>> off_sessions;   // {key,element}={id,{day_of_month,session_idx}}
+    // map<int,int> full_time_id_to_index;
+    // map<int,int> part_time_id_to_index;
     vvi session_struct; // the j-th session of day-i has session_struct[i][j] workers
-    vector<int> session_per_day;
     vector<int> part_time_session_c;
+    map<int,set<pii>> off_sessions;   // {key,element}={id,{day_of_month,session_idx}}
     map<int,int> full_time_sessions_pending_c;  // initialize in Arrange_schedule
     map<int,int> part_time_sessions_pending_c;  // initialize in Arrange_schedule
-    Position_info(int e,int p,map<int,set<pii>>of,vvi ss):full_time_c(e),part_time_c(p),off_sessions(of),session_struct(ss){
-        full_time_c=full_time_id.size();
-        part_time_c=part_time_id.size();
-        for(int i=0;i<7;i++){
-            session_per_day.push_back(session_struct[i].size());
+    void input_and_init(){
+        cin>>full_time_c;
+        cin>>part_time_c;
+        for(int i=0,id;i<full_time_c;i++){
+            cin>>id;
+            full_time_id.push_back(id);
+        }
+        for(int i=0,id;i<part_time_c;i++){
+            cin>>id;
+            part_time_id.push_back(id);
+        }
+
+        /* session_struct input and init*/
+        session_struct=vvi(7,vector<int>());
+        int session_struct_c;
+        cin>>session_struct_c;
+        for(int i=0,worker_c;i<session_struct_c;i++){
+            cin>>worker_c;
+            session_struct[1].push_back(worker_c);
+        }
+        for(int i=2;i<=5;i++){
+            session_struct[i]=session_struct[1];
+        }
+        for(int i=0,worker_c;i<session_struct_c;i++){
+            cin>>worker_c;
+            session_struct[6].push_back(worker_c);
+        }
+        for(int i=0,session_count;i<part_time_c;i++){
+            cin>>session_count;
+            part_time_session_c.push_back(session_count);
+        }
+        /* end */
+
+        int off_sessions_count;
+        cin>>off_sessions_count;
+        for(int id,off_session_day_in_month,session_index;off_sessions_count--;){
+            cin>>id>>off_session_day_in_month>>session_index;
+            if(!off_sessions.count(id)){
+                off_sessions[id]=set<pii>();
+            }
+            off_sessions[id].insert(pii(off_session_day_in_month,session_index));
         }
     }
 };
@@ -65,20 +100,7 @@ private:
     int session_per_full_time;
     int type_of_jobs_c;
     vector<vector<vector<set<int>>>> schedule;
-    vector<int> session_per_day;
     vector<Position_info> position_infos;
-    Arrange_schedule(int y,int m,int f,vector<int>spd,vector<Position_info>posi)
-        :year(y),month(m),first_day_of_the_month_in_week(f%7),session_per_day(spd),position_infos(posi){
-        // set the month day count according to year
-        vector<int> month_to_day_c={-1,31,28,31,30,31,30,31,31,30,31,30,31};
-        if (month==2 && (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
-            day_c_of_this_month=29;
-        }else{
-            day_c_of_this_month=month_to_day_c[month];
-        }
-        session_per_full_time=(day_c_of_this_month==31?44:43);
-        type_of_jobs_c=position_infos.size();
-    }
 
     vector<int> create_schedule_order(int type_of_job,int is_full_time){
         Position_info cur_pos_info=position_infos[type_of_job];
@@ -119,7 +141,7 @@ private:
     vector<int> find_available_sessions(int type_of_job,Date date,int id){
         Position_info cur_pos_info=position_infos[type_of_job];
         vector<int>available_sessions;
-        for(int session_idx=0;session_idx<cur_pos_info.session_per_day[date.in_week];session_idx++){
+        for(int session_idx=0;session_idx<cur_pos_info.session_struct[date.in_week].size();session_idx++){
             if(cur_pos_info.off_sessions[id].count(pii(date.in_month,session_idx))
                     || schedule[type_of_job][date.in_month][session_idx].size()==cur_pos_info.session_struct[date.in_week][session_idx]
                     || schedule[type_of_job][date.in_month][session_idx].count(id)
@@ -233,7 +255,7 @@ private:
             cur_day.go_to_the_next_day();
         }
     }
-public:
+
     void print_one_session_schedule(int day_in_month,int day_in_week,int session_idx){
         for(int i=0;i<type_of_jobs_c;i++){
             cout<<"    job type "<<i+1<<": ";
@@ -253,9 +275,43 @@ public:
             "Friday",    // day 5
             "Saturday"  // day 6
         };
+        vector<int>session_c={0,3,3,3,3,3,2};
         cout<<year<<'/'<<month<<'/'<<day_in_month<<' '<<day_num_to_day_name[day_in_week]<<'\n';
-        for(int i=0;i<session_per_day[day_in_week];i++){
+        for(int i=0;i<session_c[day_in_week];i++){
             print_one_session_schedule(day_in_month,day_in_week,i);
+        }
+    }
+public:
+    void arrange_schedule(){
+        for(int i=0;i<type_of_jobs_c;i++){
+            arrange_full_time_schedule(i);
+        }
+    }
+
+    void input_and_init(){
+        cin>>type_of_jobs_c;
+        position_infos=vector<Position_info>(type_of_jobs_c);
+        for(Position_info &info:position_infos){
+            info.input_and_init();
+        }
+
+        cin>>year>>month>>first_day_of_the_month_in_week;
+        vector<int> month_to_day_c={-1,31,28,31,30,31,30,31,31,30,31,30,31};
+        if (month==2 && (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+            day_c_of_this_month=29;
+        }else{
+            day_c_of_this_month=month_to_day_c[month];
+        }
+        session_per_full_time=(day_c_of_this_month==31?44:43);
+
+        // initialize sessions_pending_c for position_infos
+        for(Position_info &info:position_infos){
+            for(int i=0;i<info.full_time_c;i++){
+                info.full_time_sessions_pending_c[info.full_time_id[i]]=session_per_full_time;
+            }
+            for(int i=0;i<info.part_time_c;i++){
+                info.part_time_sessions_pending_c[info.part_time_id[i]]=info.part_time_session_c[i];
+            }
         }
     }
 
@@ -268,9 +324,8 @@ public:
 };
 
 int main(int argc,char* argv[]){
-
-
-    int year, month, first_day_of_the_month;
-    cin>>year>>month>>first_day_of_the_month;
-    cout<<"testing over\n";
+    Arrange_schedule li_an_arrange;
+    li_an_arrange.input_and_init();
+    li_an_arrange.arrange_schedule();
+    li_an_arrange.print_schedule();
 }
