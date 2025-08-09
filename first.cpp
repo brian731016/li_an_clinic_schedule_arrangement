@@ -1,8 +1,7 @@
-#include <algorithm>
 #include<bits/stdc++.h>
-#include <ios>
 using namespace std;
 using vvi=vector<vector<int>>;
+using pii=pair<int,int>;
 // <some>_c means the number of <some> (stands for some_count)
 
 void fisher_yates_suffle(vector<int>&arr){
@@ -16,21 +15,60 @@ void fisher_yates_suffle(vector<int>&arr){
 }
 
 // 0-based, so the off-day date should be subtract by 1
+class Position_info{
+public:
+    int full_time_c;
+    int part_time_c;
+    vector<int> full_time_id;
+    vector<int> part_time_id;
+    map<int,int> full_time_id_to_index;
+    map<int,int> part_time_id_to_index;
+    map<int,set<pii>> off_sessions;   // {key,element}={id,{day_of_month,session_idx}}
+    vvi session_struct; // the j-th session of day-i has session_struct[i][j] workers
+    vector<int> session_per_day;
+    vector<int> part_time_session_c;
+    map<int,int> full_time_sessions_pending_c;  // initialize in Arrange_schedule
+    map<int,int> part_time_sessions_pending_c;  // initialize in Arrange_schedule
+    Position_info(int e,int p,map<int,set<pii>>of,vvi ss):full_time_c(e),part_time_c(p),off_sessions(of),session_struct(ss){
+        full_time_c=full_time_id.size();
+        part_time_c=part_time_id.size();
+        for(int i=0;i<7;i++){
+            session_per_day.push_back(session_struct[i].size());
+        }
+    }
+};
+
+class Date{
+private:
+    int day_c_of_this_month;
+public:
+    int in_month;   // day of month
+    int in_week;    // day of week
+    Date(int dc,int m,int w):day_c_of_this_month(dc),in_month(m),in_week(w){}
+    void go_to_the_next_day(){
+        in_month=(in_month+1)%day_c_of_this_month;
+        in_week=(in_week+1)%7;
+    }
+    bool operator==(const Date other) const {
+        return day_c_of_this_month==other.day_c_of_this_month
+            && in_month==other.in_month
+            && in_week==other.in_week;
+    }
+};
+
 class Arrange_schedule{
-protected:
+private:
     int year;
     int month;
-    int first_day_of_the_month;
+    int first_day_of_the_month_in_week;
     int day_c_of_this_month;
-    int employee_c;
-    int part_time_c;
-    int session_per_employee;
-    vector<set<int>> employee_off_day;
-    vector<set<int>> part_time_off_day;
-    vvi schedule;
-    vector<int>session_per_day;
-    Arrange_schedule(int y,int m,int f,int e,int p,vector<int>spd,vector<set<int>>eod,vector<set<int>>ptod)
-        :year(y),month(m),first_day_of_the_month(f%7),employee_c(e),part_time_c(p),session_per_day(spd),employee_off_day(eod),part_time_off_day(ptod){
+    int session_per_full_time;
+    int type_of_jobs_c;
+    vector<vector<vector<set<int>>>> schedule;
+    vector<int> session_per_day;
+    vector<Position_info> position_infos;
+    Arrange_schedule(int y,int m,int f,vector<int>spd,vector<Position_info>posi)
+        :year(y),month(m),first_day_of_the_month_in_week(f%7),session_per_day(spd),position_infos(posi){
         // set the month day count according to year
         vector<int> month_to_day_c={-1,31,28,31,30,31,30,31,31,30,31,30,31};
         if (month==2 && (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
@@ -38,142 +76,174 @@ protected:
         }else{
             day_c_of_this_month=month_to_day_c[month];
         }
-        session_per_employee=(day_c_of_this_month==31?44:43);
+        session_per_full_time=(day_c_of_this_month==31?44:43);
+        type_of_jobs_c=position_infos.size();
     }
 
-    vector<int> create_schedule_order(){
-        vector<int>schedule_employee_order(session_per_employee*employee_c);
-        for(int i=0;i<employee_c;i++){
-            for(int j=0;j<session_per_employee;j++){
-                schedule_employee_order[i*session_per_employee+j]=i;
+    vector<int> create_schedule_order(int type_of_job,int is_full_time){
+        Position_info cur_pos_info=position_infos[type_of_job];
+        if(is_full_time){
+            vector<int>schedule_worker_order(session_per_full_time*cur_pos_info.full_time_c);
+            for(int i=0;i<cur_pos_info.full_time_c;i++){
+                for(int j=0;j<session_per_full_time;j++){
+                    schedule_worker_order[i*session_per_full_time+j]=i;
+                }
+            }
+            fisher_yates_suffle(schedule_worker_order);
+            return schedule_worker_order;
+        }
+        // is part-time
+        vector<int>schedule_worker_order;
+        for(int i=0;i<cur_pos_info.part_time_c;i++){
+            for(int j=0;j<cur_pos_info.part_time_session_c[i];j++){
+                schedule_worker_order.push_back(i);
             }
         }
-        fisher_yates_suffle(schedule_employee_order);
-        return schedule_employee_order;
+        fisher_yates_suffle(schedule_worker_order);
+        return schedule_worker_order;
     }
 
-    vector<int> find_available_sessions(vector<int>one_day_schedule,int day){
+    bool has_conflict(Date date,int id){  // the worder <id> has another jobs in other job type
+        for(auto one_job_schedule : schedule){
+            for(auto one_day_schedul : one_job_schedule){
+                for(auto one_session : one_day_schedul){
+                    if(one_session.count(id)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    vector<int> find_available_sessions(int type_of_job,Date date,int id){
+        Position_info cur_pos_info=position_infos[type_of_job];
         vector<int>available_sessions;
-        for(int i=0;i<one_day_schedule.size();i++){
-            if(day==6 && i==2){
+        for(int session_idx=0;session_idx<cur_pos_info.session_per_day[date.in_week];session_idx++){
+            if(cur_pos_info.off_sessions[id].count(pii(date.in_month,session_idx))
+                    || schedule[type_of_job][date.in_month][session_idx].size()==cur_pos_info.session_struct[date.in_week][session_idx]
+                    || schedule[type_of_job][date.in_month][session_idx].count(id)
+                    || has_conflict(date,id)){
                 continue;
             }
-            if(one_day_schedule[i]==-1){
-                available_sessions.push_back(i);
-            }
+            available_sessions.push_back(session_idx);
         }
         return available_sessions;
     }
 
-    void the_next_day(int &cur_day,int &cur_date){
-        cur_day=(cur_day+1)%7;
-        cur_date=(cur_date+1)%day_c_of_this_month;
-    }
-
-    void Sat_arrange_employee_shedule(int &cur_date,int cur_scheduling_employee,vector<int>&session_pending_c,vector<int>available_session,int random_schedule_session){
-        if(available_session.size()==1){
-            schedule[cur_date][available_session[0]]=cur_scheduling_employee;
-            session_pending_c[cur_scheduling_employee]--;
-        }else{
-            schedule[cur_date][0]=cur_scheduling_employee;
-            schedule[cur_date][1]=cur_scheduling_employee;
-            session_pending_c[cur_scheduling_employee]-=2;
-        }
-    }
-
-    void Mon_to_Fri_arrange_employee_shedule(int &cur_date,int cur_scheduling_employee,vector<int>&session_pending_c,vector<int>available_session,int random_schedule_session){
-        if(available_session.size()<2){
-            schedule[cur_date][available_session[0]]=cur_scheduling_employee;
-            session_pending_c[cur_scheduling_employee]--;
-        }else if(available_session.size()==2){
-            if(abs(available_session[0]-available_session[1])==1){
-                schedule[cur_date][available_session[0]]=cur_scheduling_employee;
-                schedule[cur_date][available_session[1]]=cur_scheduling_employee;
-                session_pending_c[cur_scheduling_employee]-=2;
-            }else{
-                schedule[cur_date][available_session[random_schedule_session]]=cur_scheduling_employee;
-                session_pending_c[cur_scheduling_employee]--;
+    pair<int,vector<int>> find_available_day_sessions(int type_of_job,int cur_id,Date &cur_day){
+        vector<int> available_session=find_available_sessions(type_of_job,cur_day,cur_id);
+        Date init_day=cur_day;
+        while(available_session.empty()){
+            cur_day.go_to_the_next_day();
+            available_session=find_available_sessions(type_of_job,cur_day,cur_id);
+            if(cur_day==init_day){
+                return {0,available_session};
             }
-        }else{  // available_session.size==3
-            schedule[cur_date][random_schedule_session]=cur_scheduling_employee;
-            schedule[cur_date][random_schedule_session+1]=cur_scheduling_employee;
-            session_pending_c[cur_scheduling_employee]-=2;
         }
+        init_day=cur_day;
+        while(available_session.size()<2){
+            cur_day.go_to_the_next_day();
+            available_session=find_available_sessions(type_of_job,cur_day,cur_id);
+            if(cur_day==init_day){
+                return {1,available_session};
+            }
+        }
+        init_day=cur_day;
+        while(available_session.size()<3
+                || !(available_session.size()==2 && abs(available_session[0]-available_session[1])==1)
+                ){
+            cur_day.go_to_the_next_day();
+            available_session=find_available_sessions(type_of_job,cur_day,cur_id);
+            if(cur_day==init_day){
+                return {2,available_session};
+            }
+        }
+        if(available_session.size()==2){
+            return {3,available_session};
+        }
+        return {4,available_session};
     }
 
-    void arrange_one_time(int &cur_day,int &cur_date,int cur_scheduling_employee,vector<int>&session_pending_c){
-        if(cur_day==0){
-            return;
-        }
-
-        if(session_pending_c[cur_scheduling_employee]==1){
-            //todo
-        }
-
+    void arrange_full_time_one_time(int type_of_job,Date &cur_day,int cur_id){
         random_device rd;
         mt19937 gen(rd()); // 隨機數生成器
         uniform_int_distribution<> dis(0, 1);
-        int random_schedule_session=dis(gen);
-
-        vector<int> available_session=find_available_sessions(schedule[cur_date],cur_day);
-        while(available_session.empty()){
-            the_next_day(cur_day,cur_date);
-            available_session=find_available_sessions(schedule[cur_date],cur_day);
-        }
-        int init_date=cur_date;
-        while(available_session.size()<2){
-            the_next_day(cur_day,cur_date);
-            available_session=find_available_sessions(schedule[cur_date],cur_day);
-            if(cur_date==init_date){
-                break;
+        int random_num=dis(gen);
+        if(position_infos[type_of_job].full_time_sessions_pending_c[cur_id]==1){
+            auto [available_type,available_session]=find_available_day_sessions(type_of_job,cur_id,cur_day);
+            if(available_type==1){
+                schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
+                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+            }else if(available_type==2){
+                schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+            }else if(available_type==3){
+                schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+            }else if(available_type==4){
+                uniform_int_distribution<> dis_2(0, 2);
+                random_num=dis_2(gen);
+                schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
             }
-        }
-
-        if(cur_day!=6){
-            Mon_to_Fri_arrange_employee_shedule(cur_date,cur_scheduling_employee,session_pending_c, available_session,random_schedule_session);
             return;
         }
 
-        if(cur_day==6){
-            Sat_arrange_employee_shedule(cur_date,cur_scheduling_employee,session_pending_c, available_session,random_schedule_session);
+        auto [available_type,available_session]=find_available_day_sessions(type_of_job,cur_id,cur_day);
+        // available_type might be 0,1,2,3,4
+        // {0,1,2,3,4} means {have no available session,
+        //                      only have one session,
+        //                      only have two non-consecutive sessions,
+        //                      only have two consecutive sessions,
+        //                      have tree consecutive sessions}
+        if(available_type==1){
+            schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
+            position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+        }else if(available_type==2){
+            schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+            position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+        }else if(available_type==3){
+            schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
+            schedule[type_of_job][cur_day.in_month][available_session[1]].insert(cur_id);
+            position_infos[type_of_job].full_time_sessions_pending_c[cur_id]-=2;
+        }else if(available_type==4){
+            schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+            schedule[type_of_job][cur_day.in_month][available_session[random_num+1]].insert(cur_id);
+            position_infos[type_of_job].full_time_sessions_pending_c[cur_id]-=2;
         }
-
     }
 
-    // the order is to create the feeling of random arrangement
-    void arrange_employee(){
-        vector<int>schedule_employee_order=create_schedule_order();
-        int left_c=employee_c;
-        vector<int>session_pending_c(employee_c,session_per_employee);
-        vector<bool>done_scheduling(employee_c,false);
-        int cur_day=first_day_of_the_month;
-        int cur_date;
-        for(int i=0;i<schedule_employee_order.size() && left_c>0;i++){
-            int cur_scheduling_employee=schedule_employee_order[i];
-            if(session_pending_c[cur_scheduling_employee]==0){
-                if(!done_scheduling[cur_scheduling_employee]){
-                    done_scheduling[cur_scheduling_employee]=true;
+    void arrange_full_time_schedule(int type_of_job){
+        Position_info cur_pos_info=position_infos[type_of_job];
+        vector<int>schedule_full_time_order=create_schedule_order(type_of_job,true);
+        int left_c=cur_pos_info.full_time_c;
+        vector<bool>done_scheduling(cur_pos_info.full_time_c,false);
+        Date cur_day(day_c_of_this_month,0,first_day_of_the_month_in_week);
+        for(int cur_arranging_index:schedule_full_time_order){
+            int cur_id=cur_pos_info.full_time_id[cur_arranging_index];
+            if(cur_pos_info.full_time_sessions_pending_c[cur_id]==0){
+                if(!done_scheduling[cur_arranging_index]){
+                    done_scheduling[cur_arranging_index]=true;
                     left_c--;
                 }
                 continue;
             }
-            if(!employee_off_day[cur_scheduling_employee].count(cur_date)){
-                continue;
-            }
-            arrange_one_time(cur_day,cur_date,cur_scheduling_employee,session_pending_c);
-            the_next_day(cur_day, cur_date);
+            arrange_full_time_one_time(type_of_job,cur_day,cur_id);
+            cur_day.go_to_the_next_day();
         }
     }
-
 public:
-    static void handle_input(); // 0-based, so the off-day date should be subtract by 1
-    void arrange(){
-        schedule=vvi(day_c_of_this_month,vector<int>(*max_element(session_per_day.begin(),session_per_day.end()),-1));
-        arrange_employee();
-        // arrange_part_time();
-        
+    void print_one_session_schedule(int day_in_month,int day_in_week,int session_idx){
+        for(int i=0;i<type_of_jobs_c;i++){
+            cout<<"    job type "<<i+1<<": ";
+            for(int id:schedule[i][day_in_month][session_idx]){
+                cout<<id<<" ";
+            }
+            cout<<'\n';
+        }
     }
-    void print_one_day_schedule(int date,int day,vector<int>one_day_schedule){
+    void print_one_day_schedule(int day_in_month,int day_in_week){
         vector<string>day_num_to_day_name = {
             "Sunday",    // day 0
             "Monday",    // day 1
@@ -183,23 +253,19 @@ public:
             "Friday",    // day 5
             "Saturday"  // day 6
         };
-        cout<<year<<'/'<<month<<'/'<<date<<' '<<day_num_to_day_name[day]<<' ';
-        for(int i=0;i<one_day_schedule.size();i++){
-            cout<<"session "<<i+1<<": "<<one_day_schedule[i]<<' ';
+        cout<<year<<'/'<<month<<'/'<<day_in_month<<' '<<day_num_to_day_name[day_in_week]<<'\n';
+        for(int i=0;i<session_per_day[day_in_week];i++){
+            print_one_session_schedule(day_in_month,day_in_week,i);
         }
     }
+
     void print_schedule(){
-        for(int i=0;i<schedule.size();i++){
-            print_one_day_schedule(i+1,(first_day_of_the_month+i)%7,schedule[i]);
+        for(int i=0;i<day_c_of_this_month;i++){
+            print_one_day_schedule(i+1,(first_day_of_the_month_in_week+i)%7);
+            cout<<'\n';
         }
     }
 };
-
-// class Arrange_nurse_schedule:public Arrange_schedule{
-// };
-//
-// class Arrange_admin_schedule{
-// };
 
 int main(int argc,char* argv[]){
 
