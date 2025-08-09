@@ -1,4 +1,6 @@
+#include <algorithm>
 #include<bits/stdc++.h>
+#include <ios>
 using namespace std;
 using vvi=vector<vector<int>>;
 // <some>_c means the number of <some> (stands for some_count)
@@ -13,20 +15,6 @@ void fisher_yates_suffle(vector<int>&arr){
     }
 }
 
-class Position_info{
-public:
-    int employee_c;
-    int part_time_c;
-    vector<int>employee_id;
-    vector<int>part_time_id;
-    vector<set<int>> employee_off_day;
-    vector<set<int>> part_time_off_day;
-    Position_info(int e,int p,vector<set<int>>eod,vector<set<int>>ptod):employee_c(e),part_time_c(p),employee_off_day(eod),part_time_off_day(ptod){
-        employee_c=employee_id.size();
-        part_time_c=part_time_id.size();
-    }
-};
-
 // 0-based, so the off-day date should be subtract by 1
 class Arrange_schedule{
 protected:
@@ -34,11 +22,15 @@ protected:
     int month;
     int first_day_of_the_month;
     int day_c_of_this_month;
+    int employee_c;
+    int part_time_c;
     int session_per_employee;
+    vector<set<int>> employee_off_day;
+    vector<set<int>> part_time_off_day;
     vvi schedule;
     vector<int>session_per_day;
-    Arrange_schedule(int y,int m,int f,vector<int>spd)
-        :year(y),month(m),first_day_of_the_month(f%7),session_per_day(spd){
+    Arrange_schedule(int y,int m,int f,int e,int p,vector<int>spd,vector<set<int>>eod,vector<set<int>>ptod)
+        :year(y),month(m),first_day_of_the_month(f%7),employee_c(e),part_time_c(p),session_per_day(spd),employee_off_day(eod),part_time_off_day(ptod){
         // set the month day count according to year
         vector<int> month_to_day_c={-1,31,28,31,30,31,30,31,31,30,31,30,31};
         if (month==2 && (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
