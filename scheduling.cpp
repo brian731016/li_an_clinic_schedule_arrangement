@@ -359,7 +359,10 @@ private:
             "Friday",    // day 5
             "Saturday"   // day 6
         };
-        vector<int>session_c={0,3,3,3,3,3,2};
+        vector<int>session_c(7);
+        for(int i=0;i<7;i++){
+            session_c[i]=position_infos[0].session_struct[i].size();
+        }
         cout<<year<<'/'<<month<<'/'<<day_in_month+1<<' '<<day_num_to_day_name[day_in_week]<<'\n';
         for(int i=0;i<session_c[day_in_week];i++){
             cout<<"    session "<<i+1<<":\n";
