@@ -1,0 +1,284 @@
+input done
+job 0 arranged
+job 1 arranged
+arrange done
+
+2025/11/1 Saturday
+    session 1:
+        job type 1: 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 
+
+2025/11/2 Sunday
+
+2025/11/3 Monday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 2 
+        job type 2: 
+
+2025/11/4 Tuesday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 
+    session 2:
+        job type 1: 2 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 2 
+        job type 2: 5 
+
+2025/11/5 Wednesday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 
+        job type 2: 
+
+2025/11/6 Thursday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 2 
+        job type 2: 
+
+2025/11/7 Friday
+    session 1:
+        job type 1: 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 
+        job type 2: 
+
+2025/11/8 Saturday
+    session 1:
+        job type 1: 1 
+        job type 2: 
+    session 2:
+        job type 1: 
+        job type 2: 5 
+
+2025/11/9 Sunday
+
+2025/11/10 Monday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 
+    session 3:
+        job type 1: 
+        job type 2: 5 
+
+2025/11/11 Tuesday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 5 
+    session 3:
+        job type 1: 
+        job type 2: 
+
+2025/11/12 Wednesday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 2 
+        job type 2: 5 
+
+2025/11/13 Thursday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 
+        job type 2: 
+
+2025/11/14 Friday
+    session 1:
+        job type 1: 1 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 
+    session 3:
+        job type 1: 1 2 
+        job type 2: 5 
+
+2025/11/15 Saturday
+    session 1:
+        job type 1: 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 1 
+        job type 2: 
+
+2025/11/16 Sunday
+
+2025/11/17 Monday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 
+        job type 2: 5 
+
+2025/11/18 Tuesday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 
+    session 3:
+        job type 1: 
+        job type 2: 5 
+
+2025/11/19 Wednesday
+    session 1:
+        job type 1: 1 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 
+    session 3:
+        job type 1: 1 2 
+        job type 2: 5 
+
+2025/11/20 Thursday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 5 
+    session 3:
+        job type 1: 
+        job type 2: 
+
+2025/11/21 Friday
+    session 1:
+        job type 1: 
+        job type 2: 
+    session 2:
+        job type 1: 2 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 2 
+        job type 2: 5 
+
+2025/11/22 Saturday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 2 
+        job type 2: 
+
+2025/11/23 Sunday
+
+2025/11/24 Monday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 2 
+        job type 2: 5 
+
+2025/11/25 Tuesday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 
+        job type 2: 5 
+
+2025/11/26 Wednesday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 
+    session 2:
+        job type 1: 1 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 
+        job type 2: 5 
+
+2025/11/27 Thursday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 5 
+    session 2:
+        job type 1: 1 
+        job type 2: 
+    session 3:
+        job type 1: 2 
+        job type 2: 
+
+2025/11/28 Friday
+    session 1:
+        job type 1: 2 
+        job type 2: 
+    session 2:
+        job type 1: 2 
+        job type 2: 5 
+    session 3:
+        job type 1: 1 
+        job type 2: 
+
+2025/11/29 Saturday
+    session 1:
+        job type 1: 1 2 
+        job type 2: 
+    session 2:
+        job type 1: 2 
+        job type 2: 5 
+
+2025/11/30 Sunday
+
+job type 1:
+    Worker 1 has 0 sessions not arranged.
+    Worker 2 has 0 sessions not arranged.
+    Worker 3 has 20 sessions not arranged.
+    Worker 4 has 14 sessions not arranged.
+job type 2:
+    Worker 5 has 0 sessions not arranged.
+    Worker 4 has 10 sessions not arranged.
+    Worker 6 has 17 sessions not arranged.
