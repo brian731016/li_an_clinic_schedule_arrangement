@@ -132,6 +132,7 @@ private:
         return schedule_worker_order;
     }
 
+    // return true if the worker <id> has another job at that session
     bool has_conflict(Date date,int session_idx,int id){  // the worder <id> has another jobs in other job type
         for(int i=0;i<type_of_jobs_c;i++){
             if(schedule[i][date.in_month][session_idx].count(id)){
@@ -141,6 +142,7 @@ private:
         return false;
     }
 
+    // This function will return all available sessions of a day
     vector<int> find_available_sessions(int type_of_job,Date date,int id){
         Position_info cur_pos_info=position_infos[type_of_job];
         vector<int>available_sessions;
@@ -156,7 +158,27 @@ private:
         return available_sessions;
     }
 
+    // // This function is the first part of `find_available_day_session`, which is for full-time.
+    // vector<int> find_available_day_sessions_for_part_time(int type_of_job,int cur_id,Date &cur_day){
+    //     vector<int> available_session=find_available_sessions(type_of_job,cur_day,cur_id);
+    //     Date init_day=cur_day;
+    //     while(available_session.empty()){
+    //         cur_day.go_to_the_next_day();
+    //         available_session=find_available_sessions(type_of_job,cur_day,cur_id);
+    //         if(cur_day==init_day){
+    //             return available_session;
+    //         }
+    //     }
+    //     return available_session;
+    // }
+
     pair<int,vector<int>> find_available_day_sessions(int type_of_job,int cur_id,Date &cur_day){
+        // available_type might be 0,1,2,3,4
+        // {0,1,2,3,4} means {have no available session,
+        //                      only have one session,
+        //                      only have two non-consecutive sessions,
+        //                      only have two consecutive sessions,
+        //                      have tree consecutive sessions}
         vector<int> available_session=find_available_sessions(type_of_job,cur_day,cur_id);
         Date init_day=cur_day;
         while(available_session.empty()){
@@ -190,31 +212,12 @@ private:
         return {4,available_session};
     }
 
-    void arrange_full_time_one_time(int type_of_job,Date &cur_day,int cur_id){
+    // This function is almost the same as `only_arrane_one_session`, exacpt that full_time => part_time
+    void only_arrange_one_session_for_part_time(int type_of_job,Date &cur_day,int cur_id){
         random_device rd;
         mt19937 gen(rd()); // 隨機數生成器
         uniform_int_distribution<> dis(0, 1);
         int random_num=dis(gen);
-        if(position_infos[type_of_job].full_time_sessions_pending_c[cur_id]==1){
-            auto [available_type,available_session]=find_available_day_sessions(type_of_job,cur_id,cur_day);
-            if(available_type==1){
-                schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
-                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
-            }else if(available_type==2){
-                schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
-                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
-            }else if(available_type==3){
-                schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
-                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
-            }else if(available_type==4){
-                uniform_int_distribution<> dis_2(0, 2);
-                random_num=dis_2(gen);
-                schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
-                position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
-            }
-            return;
-        }
-
         auto [available_type,available_session]=find_available_day_sessions(type_of_job,cur_id,cur_day);
         // available_type might be 0,1,2,3,4
         // {0,1,2,3,4} means {have no available session,
@@ -222,6 +225,57 @@ private:
         //                      only have two non-consecutive sessions,
         //                      only have two consecutive sessions,
         //                      have tree consecutive sessions}
+        if(available_type==1){
+            schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
+            position_infos[type_of_job].part_time_sessions_pending_c[cur_id]--;
+        }else if(available_type==2 || available_type==3){
+            schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+            position_infos[type_of_job].part_time_sessions_pending_c[cur_id]--;
+        }else if(available_type==4){
+            uniform_int_distribution<> dis_2(0, 2);
+            random_num=dis_2(gen);
+            schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+            position_infos[type_of_job].part_time_sessions_pending_c[cur_id]--;
+        }
+    }
+
+    void only_arrange_one_session(int type_of_job,Date &cur_day,int cur_id){
+        random_device rd;
+        mt19937 gen(rd()); // 隨機數生成器
+        uniform_int_distribution<> dis(0, 1);
+        int random_num=dis(gen);
+        auto [available_type,available_session]=find_available_day_sessions(type_of_job,cur_id,cur_day);
+        // available_type might be 0,1,2,3,4
+        // {0,1,2,3,4} means {have no available session,
+        //                      only have one session,
+        //                      only have two non-consecutive sessions,
+        //                      only have two consecutive sessions,
+        //                      have tree consecutive sessions}
+        if(available_type==1){
+            schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
+            position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+        }else if(available_type==2 || available_type==3){
+            schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+            position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+        }else if(available_type==4){
+            uniform_int_distribution<> dis_2(0, 2);
+            random_num=dis_2(gen);
+            schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
+            position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
+        }
+    }
+
+    void arrange_full_time_one_time(int type_of_job,Date &cur_day,int cur_id){
+        if(position_infos[type_of_job].full_time_sessions_pending_c[cur_id]==1){
+            only_arrange_one_session(type_of_job,cur_day,cur_id);
+            return;
+        }
+
+        random_device rd;
+        mt19937 gen(rd()); // 隨機數生成器
+        uniform_int_distribution<> dis(0, 1);
+        int random_num=dis(gen);
+        auto [available_type,available_session]=find_available_day_sessions(type_of_job,cur_id,cur_day);
         if(available_type==1){
             schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
             position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
@@ -262,6 +316,30 @@ private:
         }
     }
 
+    // This function is almost the same as `arange_full_time_schedule`.
+    void arrange_part_time_schedule(int type_of_job){
+        Position_info cur_pos_info=position_infos[type_of_job];
+        vector<int>schedule_part_time_order=create_schedule_order(type_of_job,false);
+        int left_c=cur_pos_info.part_time_c;
+        vector<bool>done_scheduling(cur_pos_info.part_time_c,false);
+        Date cur_day(day_c_of_this_month,0,first_day_of_the_month_in_week);
+        for(int cur_arranging_index:schedule_part_time_order){
+            if(left_c==0){
+                break;
+            }
+            int cur_id=cur_pos_info.part_time_id[cur_arranging_index];
+            if(cur_pos_info.part_time_sessions_pending_c[cur_id]==0){
+                if(!done_scheduling[cur_arranging_index]){
+                    done_scheduling[cur_arranging_index]=true;
+                    left_c--;
+                }
+                continue;
+            }
+            only_arrange_one_session_for_part_time(type_of_job,cur_day,cur_id);
+            cur_day.go_to_the_next_day();
+        }
+    }
+
     void print_one_session_schedule(int day_in_month,int day_in_week,int session_idx){
         for(int i=0;i<type_of_jobs_c;i++){
             cout<<"        job type "<<i+1<<": ";
@@ -292,6 +370,7 @@ public:
     void arrange_schedule(){
         for(int i=0;i<type_of_jobs_c;i++){
             arrange_full_time_schedule(i);
+            arrange_part_time_schedule(i);
             cout<<"job "<<i<<" arranged\n";
         }
     }
