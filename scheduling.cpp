@@ -364,9 +364,61 @@ private:
             session_c[i]=position_infos[0].session_struct[i].size();
         }
         cout<<year<<'/'<<month<<'/'<<day_in_month+1<<' '<<day_num_to_day_name[day_in_week]<<'\n';
+        vector<string>session_idx_to_session_name = {"早班","午班","晚班"};
         for(int i=0;i<session_c[day_in_week];i++){
-            cout<<"    session "<<i+1<<":\n";
+            cout<<"    "<<session_idx_to_session_name[i]<<" :\n";
             print_one_session_schedule(day_in_month,day_in_week,i);
+        }
+    }
+    void print_schedule(){
+        for(int i=0;i<day_c_of_this_month;i++){
+            print_one_day_schedule(i,(first_day_of_the_month_in_week+i)%7);
+            cout<<'\n';
+        }
+        for(int i=0;i<type_of_jobs_c;i++){
+            cout<<"job type "<<i+1<<":\n";
+            for(auto [id,left_c]:position_infos[i].full_time_sessions_pending_c){
+                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
+            }
+            for(auto [id,left_c]:position_infos[i].part_time_sessions_pending_c){
+                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
+            }
+        }
+    }
+
+    void print_one_session_schedule_for_google_sheet(int day_in_month,int day_in_week,int session_idx){
+        for(int i=0;i<type_of_jobs_c;i++){
+            cout<<"        job type "<<i+1<<": ";
+            for(int id:schedule[i][day_in_month][session_idx]){
+                cout<<id<<" ";
+            }
+            cout<<'\n';
+        }
+    }
+    void print_one_day_schedule_for_google_sheet(int day_in_month,int day_in_week){
+        vector<int>session_c(7);
+        for(int i=0;i<7;i++){
+            session_c[i]=position_infos[0].session_struct[i].size();
+        }
+        cout<<day_in_month+1<<'\n';
+        vector<string>session_idx_to_session_name = {"早班","午班","晚班"};
+        for(int i=0;i<session_c[day_in_week];i++){
+            cout<<"    "<<session_idx_to_session_name[i]<<" :\n";
+            print_one_session_schedule(day_in_month,day_in_week,i);
+        }
+    }
+    void print_schedule_for_google_sheet(){
+        for(int i=0;i<day_c_of_this_month;i++){
+            print_one_day_schedule_for_google_sheet(i,(first_day_of_the_month_in_week+i)%7);
+        }
+        for(int i=0;i<type_of_jobs_c;i++){
+            cout<<"job type "<<i+1<<":\n";
+            for(auto [id,left_c]:position_infos[i].full_time_sessions_pending_c){
+                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
+            }
+            for(auto [id,left_c]:position_infos[i].part_time_sessions_pending_c){
+                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
+            }
         }
     }
 public:
@@ -418,20 +470,12 @@ public:
         }
     }
 
-    void print_schedule(){
-        for(int i=0;i<day_c_of_this_month;i++){
-            print_one_day_schedule(i,(first_day_of_the_month_in_week+i)%7);
-            cout<<'\n';
-        }
-        for(int i=0;i<type_of_jobs_c;i++){
-            cout<<"job type "<<i+1<<":\n";
-            for(auto [id,left_c]:position_infos[i].full_time_sessions_pending_c){
-                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
-            }
-            for(auto [id,left_c]:position_infos[i].part_time_sessions_pending_c){
-                cout<<"    Worker "<<id<<" has "<<left_c<<" sessions not arranged.\n";
-            }
-        }
+    void print_text_schedule(){
+        print_schedule();
+    }
+
+    void print_schedule_for_google_sheet_input(){
+        print_schedule_for_google_sheet();
     }
 };
 
@@ -442,5 +486,6 @@ int main(int argc,char* argv[]){
     cout<<"input done\n";
     li_an_arrange.arrange_schedule();
     cout<<"arrange done\n\n";
-    li_an_arrange.print_schedule();
+    // li_an_arrange.print_text_schedule();
+    li_an_arrange.print_schedule_for_google_sheet_input();
 }

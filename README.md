@@ -1,5 +1,9 @@
 # Shift Scheduling
 
+## 現在我將這個程式結合google apps script使它可以在google sheet中以較美觀的方式呈現
+
+[The link of my google spreadsheet](https://docs.google.com/spreadsheets/d/1mWSDuDxTBBhjWv3Jr0bc-mfEbtZBjhNBNxnHiXmh7p4/edit?usp=sharing)
+
 ## Detail Feature Description
 
 一個正職一個月要做43或44節，根據當月是小月或大月決定。
