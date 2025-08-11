@@ -1,8 +1,12 @@
 # Shift Scheduling
 
-## 現在我將這個程式結合google apps script使它可以在google sheet中以較美觀的方式呈現
+## With Google Sheet
 
-[The link of my google spreadsheet](https://docs.google.com/spreadsheets/d/1mWSDuDxTBBhjWv3Jr0bc-mfEbtZBjhNBNxnHiXmh7p4/edit?usp=sharing)
+現在我將這個程式結合google apps script使它可以在google sheet中以較美觀的方式呈現
+
+[the link of my google spreadsheet](https://docs.google.com/spreadsheets/d/1mWSDuDxTBBhjWv3Jr0bc-mfEbtZBjhNBNxnHiXmh7p4/edit?usp=sharing)
+
+[the demo video of using this program](https://youtu.be/16QpGUdKyc4)
 
 ## Detail Feature Description
 

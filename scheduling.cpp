@@ -411,6 +411,7 @@ private:
         for(int i=0;i<day_c_of_this_month;i++){
             print_one_day_schedule_for_google_sheet(i,(first_day_of_the_month_in_week+i)%7);
         }
+        cout<<'\n';
         for(int i=0;i<type_of_jobs_c;i++){
             cout<<"job type "<<i+1<<":\n";
             for(auto [id,left_c]:position_infos[i].full_time_sessions_pending_c){
