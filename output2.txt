@@ -1,0 +1,275 @@
+input done
+job 0 arranged
+job 1 arranged
+arrange done
+
+1
+    早班 :
+        job type 1: 6 7 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 8 
+    晚班 :
+        job type 1: 7 8 
+        job type 2: 9 
+2
+    早班 :
+        job type 1: 7 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 8 
+3
+    早班 :
+        job type 1: 6 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 8 
+4
+    早班 :
+        job type 1: 6 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 8 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 9 
+5
+    早班 :
+        job type 1: 6 7 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 8 
+    晚班 :
+        job type 1: 8 
+        job type 2: 9 
+6
+    早班 :
+        job type 1: 6 8 
+        job type 2: 0 
+    午班 :
+        job type 1: 7 8 
+        job type 2: 9 
+7
+8
+    早班 :
+        job type 1: 7 8 
+        job type 2: 
+    午班 :
+        job type 1: 6 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 8 
+        job type 2: 9 
+9
+    早班 :
+        job type 1: 6 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 9 
+    晚班 :
+        job type 1: 7 8 
+        job type 2: 0 
+10
+    早班 :
+        job type 1: 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 8 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 9 
+11
+    早班 :
+        job type 1: 7 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 9 
+    晚班 :
+        job type 1: 8 
+        job type 2: 
+12
+    早班 :
+        job type 1: 8 
+        job type 2: 0 
+    午班 :
+        job type 1: 7 
+        job type 2: 9 
+    晚班 :
+        job type 1: 7 8 
+        job type 2: 9 
+13
+    早班 :
+        job type 1: 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 8 
+        job type 2: 0 
+14
+15
+    早班 :
+        job type 1: 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 8 
+        job type 2: 0 
+16
+    早班 :
+        job type 1: 6 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 8 
+    晚班 :
+        job type 1: 8 
+        job type 2: 9 
+17
+    早班 :
+        job type 1: 6 7 
+        job type 2: 8 
+    午班 :
+        job type 1: 8 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 9 
+18
+    早班 :
+        job type 1: 6 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 9 
+    晚班 :
+        job type 1: 7 8 
+        job type 2: 0 
+19
+    早班 :
+        job type 1: 6 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 8 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 9 
+20
+    早班 :
+        job type 1: 6 7 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 8 
+        job type 2: 0 
+21
+22
+    早班 :
+        job type 1: 6 7 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 8 
+        job type 2: 0 
+23
+    早班 :
+        job type 1: 6 7 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 8 
+24
+    早班 :
+        job type 1: 6 7 
+        job type 2: 8 
+    午班 :
+        job type 1: 7 
+        job type 2: 9 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 0 
+25
+    早班 :
+        job type 1: 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 0 
+    晚班 :
+        job type 1: 6 8 
+        job type 2: 0 
+26
+    早班 :
+        job type 1: 6 7 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 8 
+    晚班 :
+        job type 1: 7 8 
+        job type 2: 0 
+27
+    早班 :
+        job type 1: 7 8 
+        job type 2: 0 
+    午班 :
+        job type 1: 6 7 
+        job type 2: 9 
+28
+29
+    早班 :
+        job type 1: 6 7 
+        job type 2: 9 
+    午班 :
+        job type 1: 7 
+        job type 2: 8 
+    晚班 :
+        job type 1: 7 8 
+        job type 2: 0 
+30
+    早班 :
+        job type 1: 6 7 
+        job type 2: 8 
+    午班 :
+        job type 1: 6 
+        job type 2: 9 
+    晚班 :
+        job type 1: 7 8 
+        job type 2: 0 
+31
+    早班 :
+        job type 1: 7 8 
+        job type 2: 9 
+    午班 :
+        job type 1: 6 
+        job type 2: 8 
+    晚班 :
+        job type 1: 6 7 
+        job type 2: 8 
+job type 1:
+    Worker 6 has 0 sessions not arranged.
+    Worker 7 has 0 sessions not arranged.
+    Worker 8 has 65 sessions not arranged.
+job type 2:
+    Worker 9 has 0 sessions not arranged.
+    Worker 0 has 0 sessions not arranged.
+    Worker 8 has 84 sessions not arranged.

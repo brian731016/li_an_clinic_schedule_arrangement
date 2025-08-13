@@ -198,7 +198,7 @@ private:
         }
         init_day=cur_day;
         while(available_session.size()<3
-                || !(available_session.size()==2 && abs(available_session[0]-available_session[1])==1)
+                && !(available_session.size()==2 && abs(available_session[0]-available_session[1])==1)
                 ){
             cur_day.go_to_the_next_day();
             available_session=find_available_sessions(type_of_job,cur_day,cur_id);
@@ -267,6 +267,7 @@ private:
 
     void arrange_full_time_one_time(int type_of_job,Date &cur_day,int cur_id){
         if(position_infos[type_of_job].full_time_sessions_pending_c[cur_id]==1){
+            cout<<"left 1111111111111111111111111111\n";//debug
             only_arrange_one_session(type_of_job,cur_day,cur_id);
             return;
         }
@@ -277,16 +278,20 @@ private:
         int random_num=dis(gen);
         auto [available_type,available_session]=find_available_day_sessions(type_of_job,cur_id,cur_day);
         if(available_type==1){
+            cout<<"type 111111111111111111\n";//debug
             schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
             position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
         }else if(available_type==2){
+            cout<<"type 2222222222222222222222222222222222\n";//debug
             schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
             position_infos[type_of_job].full_time_sessions_pending_c[cur_id]--;
         }else if(available_type==3){
+            cout<<"type 33333333333333333333333333\n";//debug
             schedule[type_of_job][cur_day.in_month][available_session[0]].insert(cur_id);
             schedule[type_of_job][cur_day.in_month][available_session[1]].insert(cur_id);
             position_infos[type_of_job].full_time_sessions_pending_c[cur_id]-=2;
         }else if(available_type==4){
+            cout<<"type 4444444444444444444444444444444444444444444\n";//debug
             schedule[type_of_job][cur_day.in_month][available_session[random_num]].insert(cur_id);
             schedule[type_of_job][cur_day.in_month][available_session[random_num+1]].insert(cur_id);
             position_infos[type_of_job].full_time_sessions_pending_c[cur_id]-=2;
@@ -296,6 +301,8 @@ private:
     void arrange_full_time_schedule(int type_of_job){
         Position_info cur_pos_info=position_infos[type_of_job];
         vector<int>schedule_full_time_order=create_schedule_order(type_of_job,true);
+        for(int i:schedule_full_time_order)cout<<i;//debug
+        cout<<'\n';//debug
         int left_c=cur_pos_info.full_time_c;
         vector<bool>done_scheduling(cur_pos_info.full_time_c,false);
         Date cur_day(day_c_of_this_month,0,first_day_of_the_month_in_week);
@@ -428,6 +435,7 @@ public:
             arrange_full_time_schedule(i);
             arrange_part_time_schedule(i);
             cout<<"job "<<i<<" arranged\n";
+            print_schedule();// debug
         }
     }
 
